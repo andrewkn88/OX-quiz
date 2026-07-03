@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>실시간 OX 퀴즈</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --border: #e5e7eb;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #dbeafe 0, #f5f7fb 42%, #eef2ff 100%);
+      color: var(--text);
+    }
+
+    button, textarea, input {
+      font: inherit;
+    }
+
+    .app {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: #2563eb;
+      color: white;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 2px;
+      font-size: clamp(22px, 4vw, 34px);
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .badge {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: white;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 900px) {
+      .admin-grid { grid-template-columns: 1.05fr 0.95fr; }
+    }
+
+    .card {
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(229, 231, 235, 0.9);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .student-card {
+      max-width: 760px;
+      margin: 28px auto 0;
+      text-align: center;
+    }
+
+    .question-box {
+      min-height: 156px;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      border-radius: 22px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      margin: 18px 0;
+    }
+
+    .question-text {
+      font-size: clamp(24px, 6vw, 46px);
+      font-weight: 850;
+      line-height: 1.25;
+      word-break: keep-all;
+    }
+
+    .answer-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .ox-btn {
+      min-height: 132px;
+      border: none;
+      border-radius: 26px;
+      color: white;
+      font-size: clamp(54px, 15vw, 96px);
+      font-weight: 1000;
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease, filter 0.12s ease;
+    }
+
+    .ox-btn:hover { transform: translateY(-2px); }
+    .ox-btn:active { transform: translateY(1px) scale(0.99); }
+    .ox-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: grayscale(0.2); }
+
+    .o-btn { background: linear-gradient(135deg, #22c55e, #16a34a); }
+    .x-btn { background: linear-gradient(135deg, #ef4444, #dc2626); }
+
+    .selected {
+      outline: 5px solid #facc15;
+      outline-offset: 4px;
+    }
+
+    .result {
+      padding: 16px;
+      border-radius: 18px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      margin-top: 16px;
+      text-align: left;
+    }
+
+    .result strong { font-size: 20px; }
+
+    .hidden { display: none !important; }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+      color: white;
+      background: var(--primary);
+      font-weight: 800;
+      transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease;
+    }
+
+    .btn:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .btn.secondary { background: #475569; }
+    .btn.success { background: var(--success); }
+    .btn.danger { background: var(--danger); }
+    .btn.ghost {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 220px;
+      resize: vertical;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      background: #f8fafc;
+      color: var(--text);
+      outline: none;
+      line-height: 1.5;
+    }
+
+    textarea:focus { border-color: var(--primary); }
+
+    .small {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .stat {
+      display: grid;
+      grid-template-columns: 72px 1fr 56px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .bar-wrap {
+      height: 18px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      transition: width 0.2s ease;
+    }
+
+    .bar.o { background: #22c55e; }
+    .bar.x { background: #ef4444; }
+    .bar.none { background: #94a3b8; }
+
+    .question-list {
+      max-height: 270px;
+      overflow: auto;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: #f8fafc;
+      margin-top: 12px;
+    }
+
+    .question-item {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .question-item:last-child { border-bottom: none; }
+    .question-item.active { background: #dbeafe; font-weight: 800; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-weight: 900;
+      color: white;
+      font-size: 12px;
+      margin-right: 6px;
+    }
+
+    .pill.o { background: #22c55e; }
+    .pill.x { background: #ef4444; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      transform: translateX(-50%);
+      background: #111827;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      font-weight: 700;
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-6px);
+    }
+
+    .qr-box {
+      display: grid;
+      place-items: center;
+      min-height: 170px;
+      border-radius: 18px;
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      text-align: center;
+      padding: 12px;
+      word-break: break-all;
+    }
+
+    .link-text {
+      color: var(--primary);
+      font-weight: 800;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">OX</div>
+        <div>
+          <h1>실시간 OX 퀴즈</h1>
+          <p class="subtitle" id="subtitle">Firebase Realtime Database 기반</p>
+        </div>
+      </div>
+      <div class="badge" id="modeBadge">학생 화면</div>
+    </div>
+
+    <main id="root"></main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import {
+      getDatabase,
+      ref,
+      set,
+      update,
+      onValue,
+      get,
+      serverTimestamp,
+      onDisconnect
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js";
+
+    /*********************************************************
+     * 1) Firebase Console에서 복사한 설정값을 여기에 입력하세요.
+     * 2) databaseURL은 Realtime Database 생성 후 나오는 URL입니다.
+     *********************************************************/
+    const firebaseConfig = {
+      apiKey: "",
+      authDomain: "",
+      databaseURL: "",
+      projectId: "",
+      storageBucket: "",
+      messagingSenderId: "",
+      appId: ""
+    };
+
+    const ROOM_ID = "main";
+    const isAdmin = location.pathname.replace(/\/$/, "") === "/admin";
+    const root = document.getElementById("root");
+    const modeBadge = document.getElementById("modeBadge");
+    const subtitle = document.getElementById("subtitle");
+    const toast = document.getElementById("toast");
+
+    let app;
+    let db;
+    let state = null;
+    let studentId = localStorage.getItem("oxStudentId");
+    let audioReady = false;
+    let audioContext;
+
+    if (!studentId) {
+      studentId = `student_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+      localStorage.setItem("oxStudentId", studentId);
+    }
+
+    const initialState = {
+      questions: [],
+      currentIndex: 0,
+      started: false,
+      reveal: false,
+      roundId: 0,
+      updatedAt: Date.now()
+    };
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function ensureAudio() {
+      if (audioReady) return;
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      audioReady = true;
+    }
+
+    function beep(type = "click") {
+      if (!audioReady || !audioContext) return;
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const now = audioContext.currentTime;
+
+      const config = {
+        join: [660, 0.09],
+        click: [520, 0.055],
+        correct: [880, 0.12],
+        wrong: [220, 0.16],
+        next: [740, 0.08]
+      }[type] || [500, 0.06];
+
+      oscillator.frequency.setValueAtTime(config[0], now);
+      oscillator.type = type === "wrong" ? "sawtooth" : "sine";
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + config[1]);
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+      oscillator.start(now);
+      oscillator.stop(now + config[1] + 0.02);
+    }
+
+    function parseQuestions(text) {
+      return text
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .map((line, index) => {
+          const cols = line.split(/\t|,/).map(v => v.trim());
+          if (index === 0 && /문제/.test(cols[0]) && /정답/.test(cols[1] || "")) return null;
+          const question = cols[0] || "";
+          const answer = (cols[1] || "").toUpperCase();
+          const explanation = cols.slice(2).join(" ") || "";
+          if (!question || !["O", "X"].includes(answer)) return null;
+          return { question, answer, explanation };
+        })
+        .filter(Boolean);
+    }
+
+    function getCurrentQuestion() {
+      if (!state?.questions?.length) return null;
+      return state.questions[state.currentIndex] || null;
+    }
+
+    function getResponsesForCurrentRound() {
+      const roundKey = String(state?.roundId || 0);
+      return state?.responses?.[roundKey] || {};
+    }
+
+    function countResponses() {
+      const responses = Object.values(getResponsesForCurrentRound());
+      const o = responses.filter(r => r.answer === "O").length;
+      const x = responses.filter(r => r.answer === "X").length;
+      const total = responses.length;
+      return { o, x, total };
+    }
+
+    function percent(value, total) {
+      if (!total) return 0;
+      return Math.round((value / total) * 100);
+    }
+
+    async function initFirebase() {
+      if (!firebaseConfig.apiKey || !firebaseConfig.databaseURL) {
+        root.innerHTML = `
+          <section class="card student-card">
+            <h2>Firebase 설정값이 비어 있습니다.</h2>
+            <p class="small">
+              <strong>index.html</strong> 파일 안의 <strong>firebaseConfig</strong>에 Firebase Console 설정값을 입력해야 실시간 기능이 작동합니다.
+            </p>
+          </section>
+        `;
+        return;
+      }
+
+      app = initializeApp(firebaseConfig);
+      db = getDatabase(app);
+
+      const stateRef = ref(db, `rooms/${ROOM_ID}/state`);
+      const snap = await get(stateRef);
+      if (!snap.exists()) {
+        await set(stateRef, initialState);
+      }
+
+      onValue(stateRef, snapshot => {
+        state = snapshot.val() || initialState;
+        render();
+      });
+
+      if (!isAdmin) {
+        const studentRef = ref(db, `rooms/${ROOM_ID}/students/${studentId}`);
+        await set(studentRef, {
+          joinedAt: Date.now(),
+          lastSeen: Date.now(),
+          online: true
+        });
+        onDisconnect(studentRef).update({ online: false, leftAt: serverTimestamp() });
+      }
+    }
+
+    function render() {
+      if (isAdmin) renderAdmin();
+      else renderStudent();
+    }
+
+    function renderStudent() {
+      modeBadge.textContent = "학생 화면";
+      subtitle.textContent = "기본 링크로 바로 참여";
+      const q = getCurrentQuestion();
+      const roundKey = String(state?.roundId || 0);
+      const myAnswer = state?.responses?.[roundKey]?.[studentId]?.answer;
+      const disabled = !state?.started || !q || !!myAnswer || state?.reveal;
+      const resultVisible = state?.reveal && q;
+      const isCorrect = myAnswer && q && myAnswer === q.answer;
+
+      root.innerHTML = `
+        <section class="card student-card">
+          <h2>${state?.started ? `문제 ${Number(state.currentIndex) + 1}` : "퀴즈 대기 중"}</h2>
+          <p class="small">처음 접속했다면 아래 버튼을 한 번 눌러 효과음을 활성화하세요.</p>
+          <button class="btn ghost" id="joinBtn">참여하기 / 효과음 켜기</button>
+
+          <div class="question-box">
+            <div class="question-text">${q ? escapeHtml(q.question) : "강사가 문제를 시작하면 여기에 표시됩니다."}</div>
+          </div>
+
+          <div class="answer-buttons">
+            <button class="ox-btn o-btn ${myAnswer === "O" ? "selected" : ""}" id="answerO" ${disabled ? "disabled" : ""}>O</button>
+            <button class="ox-btn x-btn ${myAnswer === "X" ? "selected" : ""}" id="answerX" ${disabled ? "disabled" : ""}>X</button>
+          </div>
+
+          <p class="small">
+            ${myAnswer ? `선택 완료: <strong>${myAnswer}</strong>` : state?.started ? "O 또는 X를 선택하세요." : "아직 시작 전입니다."}
+          </p>
+
+          <div class="result ${resultVisible ? "" : "hidden"}">
+            <strong>${myAnswer ? (isCorrect ? "정답입니다." : "아쉽습니다.") : "응답하지 않았습니다."}</strong>
+            <p>정답: <strong>${q ? q.answer : ""}</strong></p>
+            <p>${q?.explanation ? escapeHtml(q.explanation) : "해설이 없습니다."}</p>
+          </div>
+        </section>
+      `;
+
+      document.getElementById("joinBtn").onclick = () => {
+        ensureAudio();
+        beep("join");
+        showToast("참여 완료");
+      };
+      document.getElementById("answerO").onclick = () => submitAnswer("O");
+      document.getElementById("answerX").onclick = () => submitAnswer("X");
+
+      if (resultVisible && myAnswer && audioReady) {
+        setTimeout(() => beep(isCorrect ? "correct" : "wrong"), 80);
+      }
+    }
+
+    async function submitAnswer(answer) {
+      ensureAudio();
+      beep("click");
+      const roundKey = String(state?.roundId || 0);
+      await set(ref(db, `rooms/${ROOM_ID}/state/responses/${roundKey}/${studentId}`), {
+        answer,
+        answeredAt: Date.now()
+      });
+      showToast(`${answer} 선택 완료`);
+    }
+
+    function renderAdmin() {
+      modeBadge.textContent = "강사 화면";
+      subtitle.textContent = "/admin 전용 진행 화면";
+      const q = getCurrentQuestion();
+      const counts = countResponses();
+      const onlineCount = state?.students ? Object.values(state.students).filter(s => s.online).length : 0;
+      const totalForGraph = Math.max(counts.total, 1);
+      const studentUrl = location.origin + "/";
+
+      root.innerHTML = `
+        <div class="grid admin-grid">
+          <section class="card">
+            <h2>문제 일괄 입력</h2>
+            <p class="small">엑셀/구글시트에서 복사한 표를 그대로 붙여넣으세요. 형식: 문제 / 정답 / 해설</p>
+            <textarea id="quizInput" placeholder="문제\t정답\t해설\n태양은 별이다\tO\t태양은 스스로 빛을 내는 항성입니다.\n지구는 태양보다 크다\tX\t태양보다 지구가 훨씬 작습니다."></textarea>
+            <div class="row" style="margin-top: 12px;">
+              <button class="btn" id="loadBtn">문제 불러오기</button>
+              <button class="btn success" id="startBtn" ${state?.questions?.length ? "" : "disabled"}>게임 시작</button>
+              <button class="btn danger" id="resetBtn">전체 초기화</button>
+            </div>
+
+            <h3 style="margin-top: 22px;">문제 목록</h3>
+            <div class="question-list">
+              ${renderQuestionList()}
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>진행 현황</h2>
+            <p class="small">학생 접속 링크: <span class="link-text">${studentUrl}</span></p>
+            <div class="qr-box">
+              <div>
+                <p class="small">QR 코드 서비스 없이도 링크를 복사해 공유할 수 있습니다.</p>
+                <button class="btn ghost" id="copyLinkBtn">학생 링크 복사</button>
+              </div>
+            </div>
+
+            <div class="question-box" style="min-height: 120px; text-align:center;">
+              <div>
+                <p class="small">현재 문제 ${q ? `${Number(state.currentIndex) + 1} / ${state.questions.length}` : "없음"}</p>
+                <div style="font-size: 24px; font-weight: 900;">${q ? escapeHtml(q.question) : "문제를 불러오세요."}</div>
+              </div>
+            </div>
+
+            <div class="row">
+              <button class="btn" id="prevBtn" ${!q || state.currentIndex <= 0 ? "disabled" : ""}>이전 문제</button>
+              <button class="btn" id="revealBtn" ${!q ? "disabled" : ""}>정답 공개</button>
+              <button class="btn secondary" id="nextBtn" ${!q || state.currentIndex >= state.questions.length - 1 ? "disabled" : ""}>다음 문제</button>
+              <button class="btn ghost" id="clearRoundBtn" ${!q ? "disabled" : ""}>현재 응답 초기화</button>
+            </div>
+
+            <div class="status-list">
+              <div class="stat"><strong>O</strong><div class="bar-wrap"><div class="bar o" style="width:${percent(counts.o, totalForGraph)}%"></div></div><span>${counts.o}명</span></div>
+              <div class="stat"><strong>X</strong><div class="bar-wrap"><div class="bar x" style="width:${percent(counts.x, totalForGraph)}%"></div></div><span>${counts.x}명</span></div>
+              <div class="stat"><strong>응답</strong><div class="bar-wrap"><div class="bar none" style="width:${percent(counts.total, totalForGraph)}%"></div></div><span>${counts.total}명</span></div>
+            </div>
+
+            <p class="small" style="margin-top:14px;">현재 온라인 학생: ${onlineCount}명</p>
+            ${q && state?.reveal ? `<div class="result"><strong>정답: ${q.answer}</strong><p>${q.explanation ? escapeHtml(q.explanation) : "해설이 없습니다."}</p></div>` : ""}
+          </section>
+        </div>
+      `;
+
+      document.getElementById("loadBtn").onclick = loadQuestions;
+      document.getElementById("startBtn").onclick = startGame;
+      document.getElementById("resetBtn").onclick = resetAll;
+      document.getElementById("prevBtn").onclick = prevQuestion;
+      document.getElementById("nextBtn").onclick = nextQuestion;
+      document.getElementById("revealBtn").onclick = revealAnswer;
+      document.getElementById("clearRoundBtn").onclick = clearRound;
+      document.getElementById("copyLinkBtn").onclick = async () => {
+        await navigator.clipboard.writeText(studentUrl);
+        showToast("학생 링크를 복사했습니다.");
+      };
+    }
+
+    function renderQuestionList() {
+      if (!state?.questions?.length) {
+        return `<div class="question-item">아직 등록된 문제가 없습니다.</div>`;
+      }
+      return state.questions.map((item, index) => `
+        <div class="question-item ${index === Number(state.currentIndex) ? "active" : ""}">
+          <span class="pill ${item.answer.toLowerCase()}">${item.answer}</span>
+          ${index + 1}. ${escapeHtml(item.question)}
+        </div>
+      `).join("");
+    }
+
+    async function loadQuestions() {
+      ensureAudio();
+      const text = document.getElementById("quizInput").value;
+      const questions = parseQuestions(text);
+      if (!questions.length) {
+        showToast("문제 형식을 확인하세요.");
+        return;
+      }
+      await update(ref(db, `rooms/${ROOM_ID}/state`), {
+        questions,
+        currentIndex: 0,
+        started: false,
+        reveal: false,
+        roundId: Date.now(),
+        responses: null,
+        updatedAt: Date.now()
+      });
+      beep("join");
+      showToast(`${questions.length}개 문제를 불러왔습니다.`);
+    }
+
+    async function startGame() {
+      ensureAudio();
+      beep("next");
+      await update(ref(db, `rooms/${ROOM_ID}/state`), {
+        started: true,
+        reveal: false,
+        roundId: Date.now(),
+        updatedAt: Date.now()
+      });
+    }
+
+    async function revealAnswer() {
+      ensureAudio();
+      beep("correct");
+      await update(ref(db, `rooms/${ROOM_ID}/state`), {
+        reveal: true,
+        updatedAt: Date.now()
+      });
+    }
+
+    async function nextQuestion() {
+      ensureAudio();
+      beep("next");
+      await update(ref(db, `rooms/${ROOM_ID}/state`), {
+        currentIndex: Number(state.currentIndex) + 1,
+        reveal: false,
+        roundId: Date.now(),
+        updatedAt: Date.now()
+      });
+    }
+
+    async function prevQuestion() {
+      ensureAudio();
+      beep("next");
+      await update(ref(db, `rooms/${ROOM_ID}/state`), {
+        currentIndex: Math.max(0, Number(state.currentIndex) - 1),
+        reveal: false,
+        roundId: Date.now(),
+        updatedAt: Date.now()
+      });
+    }
+
+    async function clearRound() {
+      ensureAudio();
+      beep("click");
+      await update(ref(db, `rooms/${ROOM_ID}/state`), {
+        reveal: false,
+        roundId: Date.now(),
+        updatedAt: Date.now()
+      });
+      showToast("현재 문제 응답을 초기화했습니다.");
+    }
+
+    async function resetAll() {
+      ensureAudio();
+      if (!confirm("전체 문제와 응답을 초기화할까요?")) return;
+      await set(ref(db, `rooms/${ROOM_ID}/state`), initialState);
+      beep("wrong");
+      showToast("초기화했습니다.");
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    initFirebase().catch(error => {
+      console.error(error);
+      root.innerHTML = `
+        <section class="card student-card">
+          <h2>앱을 시작하지 못했습니다.</h2>
+          <p class="small">Firebase 설정값과 Realtime Database 규칙을 확인하세요.</p>
+          <pre style="white-space:pre-wrap;text-align:left;background:#f8fafc;padding:12px;border-radius:12px;">${escapeHtml(error.message)}</pre>
+        </section>
+      `;
+    });
+  </script>
+</body>
+</html>
