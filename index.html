@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>실시간 OX 퀴즈 교실</title>
+  <style>
+    :root{--bg:#f6f8fc;--card:#fff;--text:#111827;--muted:#64748b;--line:#e5e7eb;--brand:#4f46e5;--green:#10b981;--red:#ef4444;--amber:#f59e0b;--shadow:0 20px 60px rgba(15,23,42,.08);--radius:22px}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}button,input,textarea,select{font:inherit}button{border:0;cursor:pointer}.top{display:flex;align-items:center;gap:14px;padding:18px 24px;background:rgba(255,255,255,.9);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;backdrop-filter:blur(10px)}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;display:grid;place-items:center;font-weight:900}.title h1{font-size:22px;margin:0}.title p{margin:3px 0 0;color:var(--muted);font-size:13px}.wrap{max-width:1180px;margin:0 auto;padding:24px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px}.card h2{margin:0 0 10px;font-size:24px}.desc{color:var(--muted);line-height:1.7;font-size:14px}.section{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}label{display:block;font-weight:700;font-size:13px;margin:12px 0 8px;color:#334155}input,textarea,select{width:100%;border:1px solid #dbe3ef;background:#f8fafc;border-radius:16px;padding:14px 16px;outline:none}textarea{min-height:142px;resize:vertical;line-height:1.55}.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}.btn{width:100%;border-radius:16px;padding:14px 16px;font-weight:800;background:#e5e7eb;color:#111827}.btn.primary{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff}.btn.green{background:var(--green);color:#fff}.btn.red{background:var(--red);color:#fff}.btn.amber{background:var(--amber);color:#fff}.btn.ghost{background:#f1f5f9;color:#334155}.btn:disabled{opacity:.45;cursor:not-allowed}.pill{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;background:#eef2ff;color:#3730a3;border-radius:999px;font-size:12px;font-weight:800}.quizBox{border:1px solid var(--line);background:#f8fafc;border-radius:20px;padding:22px;text-align:center;margin-top:18px}.qnum{font-size:13px;color:var(--muted);font-weight:800}.question{font-size:30px;font-weight:900;line-height:1.35;margin:14px 0}.ox{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.ox button{font-size:64px;font-weight:1000;color:#fff;border-radius:22px;padding:24px 10px}.o{background:#86d6a3}.x{background:#e6979b}.selected{outline:5px solid #111827;transform:scale(.98)}.small{font-size:13px;color:var(--muted);line-height:1.55}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.stat{background:#f8fafc;border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center}.stat b{display:block;font-size:22px}.bars{display:grid;gap:10px;margin-top:12px}.bar{background:#eef2f7;border-radius:999px;overflow:hidden;height:28px;position:relative}.bar span{display:block;height:100%;border-radius:999px}.bar em{position:absolute;inset:0;display:grid;place-items:center;font-style:normal;font-weight:800;font-size:12px}.leader{width:100%;border-collapse:collapse}.leader th,.leader td{padding:10px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}.leader th{color:#475569}.qr{display:grid;place-items:center;background:#f8fafc;border:1px solid var(--line);border-radius:18px;padding:14px;min-height:170px}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#111827;color:#fff;padding:12px 16px;border-radius:999px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.2s;z-index:99}.toast.show{opacity:1}.hidden{display:none!important}.answer{font-size:18px;font-weight:900;margin-top:12px}.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:80}.piece{position:absolute;width:10px;height:14px;top:-20px;animation:fall 1.4s linear forwards}@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.2}}@media(max-width:850px){.wrap{padding:14px}.grid{grid-template-columns:1fr}.card{padding:20px}.question{font-size:24px}.ox button{font-size:52px}.stats{grid-template-columns:repeat(2,1fr)}.top{padding:12px 14px}.title h1{font-size:18px}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="logo">OX</div><div class="title"><h1>실시간 OX 퀴즈 교실</h1><p>강사와 학생이 같은 링크에서 참여하는 실시간 학급 퀴즈 게임</p></div></header>
+  <main class="wrap">
+    <div class="grid">
+      <section class="card" id="teacherCard">
+        <span class="pill">선생님 / 강사 화면</span>
+        <h2>퀴즈 운영</h2>
+        <p class="desc">문제를 붙여넣거나 API 없이 주제별 OX 문제를 자동 생성한 뒤 게임을 시작하세요. 학생 접속 QR, 실시간 응답, 순위표, CSV 저장을 한 화면에서 관리합니다.</p>
+        <div class="section">
+          <label>API 없이 주제별 문제 자동 생성</label>
+          <div class="row"><input id="topic" placeholder="예: 과학, 인공지능, 역사"/><select id="count"><option>5</option><option>10</option><option>15</option></select></div>
+          <button class="btn ghost" id="makeQuestions">OX 문제 자동 생성</button>
+          <label>문제 붙여넣기: 문제 TAB 정답 TAB 해설</label>
+          <textarea id="bulk" placeholder="문제	정답	해설&#10;태양은 스스로 빛을 내는 별이다.	O	태양은 항성입니다."></textarea>
+          <div class="row"><button class="btn primary" id="loadQuestions">문제 불러오기</button><button class="btn red" id="resetGame">전체 초기화</button></div>
+        </div>
+        <div class="section">
+          <div class="row"><button class="btn green" id="startGame">게임 시작</button><button class="btn amber" id="reveal">정답 공개</button><button class="btn primary" id="nextQ">다음 문제</button></div>
+          <button class="btn ghost" id="downloadCsv" style="margin-top:10px">문제별 결과 CSV 다운로드</button>
+        </div>
+        <div class="section">
+          <h3>학생 접속 QR</h3><div class="qr" id="qr"></div><p class="small" id="joinUrl"></p>
+        </div>
+      </section>
+
+      <section class="card" id="studentCard">
+        <span class="pill">학생 참여 화면</span>
+        <h2>퀴즈 참여</h2>
+        <p class="desc">닉네임을 입력하고 참여하기를 누르세요. 선생님이 문제를 시작하면 O 또는 X를 선택할 수 있습니다.</p>
+        <div class="section" id="joinBox"><label>내 닉네임 / 이름</label><input id="nickname" placeholder="예: 홍길동, 귀여운라이언"/><button class="btn green" id="joinBtn">참여하기 / 효과음 켜기</button></div>
+        <div class="quizBox"><div class="qnum" id="qnum">퀴즈 대기 중</div><div class="question" id="question">선생님이 문제를 시작하면 여기에 표시됩니다.</div><div class="ox"><button class="o" id="btnO">O</button><button class="x" id="btnX">X</button></div><div class="answer" id="answer"></div><p class="small" id="status">아직 시작 전입니다.</p></div>
+      </section>
+    </div>
+
+    <div class="grid" style="margin-top:22px">
+      <section class="card"><h2>실시간 응답 현황</h2><div class="stats"><div class="stat"><b id="totalStudents">0</b><span>참여 학생</span></div><div class="stat"><b id="oCount">0</b><span>O 선택</span></div><div class="stat"><b id="xCount">0</b><span>X 선택</span></div><div class="stat"><b id="rate">0%</b><span>정답률</span></div></div><div class="bars"><div class="bar"><span id="oBar" style="background:#86d6a3;width:0%"></span><em>O</em></div><div class="bar"><span id="xBar" style="background:#e6979b;width:0%"></span><em>X</em></div><div class="bar"><span id="correctBar" style="background:#60a5fa;width:0%"></span><em>정답률</em></div></div></section>
+      <section class="card"><h2>순위표</h2><table class="leader"><thead><tr><th>순위</th><th>닉네임</th><th>점수</th><th>응답</th></tr></thead><tbody id="leaderBody"><tr><td colspan="4">아직 참여자가 없습니다.</td></tr></tbody></table></section>
+    </div>
+  </main>
+  <div class="toast" id="toast"></div><div class="confetti" id="confetti"></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "여기에_API_KEY",
+      authDomain: "여기에_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://여기에_PROJECT_ID-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "여기에_PROJECT_ID",
+      storageBucket: "여기에_PROJECT_ID.appspot.com",
+      messagingSenderId: "여기에_SENDER_ID",
+      appId: "여기에_APP_ID"
+    };
+    const ROOM = "main";
+    const $ = id => document.getElementById(id);
+    const uid = localStorage.getItem('ox_uid') || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random()));
+    localStorage.setItem('ox_uid', uid);
+    let db, gameRef, joined=false, meName=localStorage.getItem('ox_name')||'', game={questions:[],current:-1,started:false,revealed:false,answers:{},students:{},history:{}};
+    $('nickname').value = meName;
+    function toast(t){$('toast').textContent=t;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),1800)}
+    function beep(type='click'){try{const ac=new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator();const g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=type==='correct'?880:type==='wrong'?220:type==='join'?660:440;g.gain.setValueAtTime(.08,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.18);o.start();o.stop(ac.currentTime+.18)}catch(e){}}
+    function confetti(){for(let i=0;i<50;i++){const p=document.createElement('i');p.className='piece';p.style.left=Math.random()*100+'vw';p.style.background=['#6366f1','#10b981','#f59e0b','#ef4444','#38bdf8'][i%5];p.style.animationDelay=Math.random()*0.4+'s';$('confetti').appendChild(p);setTimeout(()=>p.remove(),1700)}}
+    function init(){try{firebase.initializeApp(firebaseConfig);db=firebase.database();gameRef=db.ref('oxQuiz/'+ROOM);gameRef.on('value',s=>{game=s.val()||game;render()});}catch(e){toast('Firebase 설정을 확인하세요');console.error(e)}}
+    function update(p){return gameRef.update(p)}
+    function parseQuestions(text){return text.trim().split(/\n+/).map(x=>x.trim()).filter(Boolean).filter((line,i)=>!(i===0&&line.includes('문제')&&line.includes('정답'))).map(line=>{const c=line.split('\t');return {q:(c[0]||'').trim(),a:((c[1]||'O').trim().toUpperCase().startsWith('O')?'O':'X'),e:(c[2]||'').trim()}}).filter(x=>x.q)}
+    function sample(topic,n){
+      const key=topic.replace(/\s+/g,'').toLowerCase();
+      const banks={
+        '과학':[
+          ['태양은 스스로 빛을 내는 별이다.','O','태양은 핵융합 반응으로 빛과 열을 내는 항성입니다.'],
+          ['지구는 태양보다 크다.','X','태양의 지름은 지구의 약 109배입니다.'],
+          ['달은 스스로 빛을 내는 천체이다.','X','달은 태양빛을 반사해서 밝게 보입니다.'],
+          ['빛은 소리보다 빠르다.','O','빛은 진공에서 초속 약 30만 km로 이동합니다.'],
+          ['물의 끓는점은 기압에 따라 달라질 수 있다.','O','고도가 높아져 기압이 낮아지면 끓는점도 낮아집니다.'],
+          ['식물은 광합성을 통해 양분을 만든다.','O','식물은 빛에너지를 이용해 이산화탄소와 물로 양분을 만듭니다.'],
+          ['공기는 아무 질량도 없다.','X','공기도 물질이므로 질량을 가지고 있습니다.'],
+          ['자석은 철을 끌어당길 수 있다.','O','철, 니켈, 코발트 같은 물질은 자석에 잘 끌립니다.'],
+          ['지구의 자전은 낮과 밤이 생기는 주요 원인이다.','O','지구가 자전하면서 태양을 향한 쪽과 반대쪽이 바뀝니다.'],
+          ['소리는 진공에서도 잘 전달된다.','X','소리는 매질의 진동으로 전달되므로 진공에서는 전달되지 않습니다.'],
+          ['모든 금속은 자석에 붙는다.','X','알루미늄이나 구리처럼 일반 자석에 잘 붙지 않는 금속도 있습니다.'],
+          ['증발은 물이 표면에서 수증기로 변하는 현상이다.','O','액체 표면의 분자가 기체 상태로 변하는 현상입니다.'],
+          ['화석은 과거 생물이나 그 흔적이 남은 것이다.','O','화석은 과거 생물의 몸체나 활동 흔적이 보존된 자료입니다.'],
+          ['전기는 전하의 이동과 관련이 있다.','O','전류는 전하가 이동하는 현상입니다.'],
+          ['중력은 물체를 서로 끌어당기는 힘이다.','O','질량을 가진 물체 사이에는 서로 끌어당기는 힘이 작용합니다.']
+        ],
+        '인공지능':[
+          ['인공지능은 데이터를 학습하여 패턴을 찾을 수 있다.','O','많은 AI 모델은 데이터에서 규칙이나 패턴을 찾아 예측합니다.'],
+          ['인공지능은 항상 100% 정확한 답을 낸다.','X','AI도 데이터와 상황에 따라 틀릴 수 있습니다.'],
+          ['생성형 AI는 글, 이미지, 코드 등을 만들 수 있다.','O','생성형 AI는 입력에 따라 다양한 형식의 결과물을 생성할 수 있습니다.'],
+          ['AI가 만든 답은 출처 확인 없이 항상 믿어도 된다.','X','AI 답변에는 오류가 있을 수 있어 중요한 내용은 검증이 필요합니다.'],
+          ['머신러닝은 인공지능의 한 분야이다.','O','머신러닝은 데이터 기반으로 학습하는 인공지능 방법 중 하나입니다.'],
+          ['AI는 학습 데이터의 편향을 반영할 수 있다.','O','데이터가 편향되어 있으면 결과에도 편향이 나타날 수 있습니다.'],
+          ['프롬프트는 AI에게 주는 지시문이나 질문이다.','O','프롬프트는 AI 응답의 방향을 정하는 입력문입니다.'],
+          ['AI를 쓰면 사람의 판단이 전혀 필요 없다.','X','결과 검토와 최종 판단은 사람이 해야 합니다.'],
+          ['챗봇은 사람과 대화하도록 만든 프로그램이다.','O','챗봇은 사용자의 입력에 답하도록 설계된 대화형 시스템입니다.'],
+          ['AI는 개인정보를 다룰 때 주의가 필요하다.','O','개인정보 입력과 저장, 공유에는 보안과 윤리적 주의가 필요합니다.']
+        ],
+        '역사':[
+          ['역사는 과거의 사건과 사람들의 삶을 연구하는 분야이다.','O','역사는 기록과 유물을 바탕으로 과거를 이해하려는 학문입니다.'],
+          ['역사 자료는 모두 같은 신뢰도를 가진다.','X','자료의 출처와 작성 의도에 따라 신뢰도가 달라질 수 있습니다.'],
+          ['1차 사료는 당시의 기록이나 유물처럼 사건과 가까운 자료이다.','O','일기, 공문서, 유물 등은 1차 사료가 될 수 있습니다.'],
+          ['역사 해석은 새로운 자료가 발견되어도 절대 바뀌지 않는다.','X','새 자료와 관점에 따라 해석은 달라질 수 있습니다.'],
+          ['연표는 사건의 시간적 순서를 이해하는 데 도움이 된다.','O','연표는 사건의 앞뒤 관계를 파악하는 도구입니다.'],
+          ['역사를 배울 때 원인과 결과를 함께 보는 것이 중요하다.','O','사건은 여러 원인과 결과가 연결되어 일어납니다.'],
+          ['유물과 유적은 과거 생활을 이해하는 단서가 된다.','O','물건과 장소는 당시 사람들의 생활을 보여줍니다.'],
+          ['역사는 단순히 연도만 외우는 과목이다.','X','역사는 사건의 의미와 맥락을 이해하는 것이 중요합니다.'],
+          ['같은 사건도 입장에 따라 다르게 기록될 수 있다.','O','기록자의 위치와 목적에 따라 서술이 달라질 수 있습니다.'],
+          ['역사 공부에는 자료를 비판적으로 읽는 태도가 필요하다.','O','출처, 근거, 관점을 함께 확인해야 합니다.']
+        ]
+      };
+      const generic=[
+        [`${topic}은/는 핵심 개념을 이해하면 더 쉽게 배울 수 있다.`,'O','핵심 개념을 알면 세부 내용을 연결해서 이해할 수 있습니다.'],
+        [`${topic}은/는 정답만 외우면 항상 응용할 수 있다.`,'X','응용하려면 개념과 상황을 함께 이해해야 합니다.'],
+        [`${topic}을/를 배울 때 예시를 들어 생각하면 도움이 된다.`,'O','구체적인 예시는 추상적인 내용을 이해하는 데 도움이 됩니다.'],
+        [`${topic}에 대한 설명은 근거를 확인하는 태도가 중요하다.`,'O','근거와 출처를 확인하면 잘못된 정보를 줄일 수 있습니다.'],
+        [`${topic}은/는 질문을 던지며 배울 때 이해가 깊어진다.`,'O','질문은 탐구와 사고를 확장하는 출발점입니다.'],
+        [`${topic}에 대한 모든 설명은 시대와 상황이 달라도 항상 동일하다.`,'X','분야에 따라 새로운 정보나 관점이 반영될 수 있습니다.'],
+        [`${topic} 학습에서는 틀린 답을 확인하는 과정도 중요하다.`,'O','오답을 분석하면 잘못 이해한 부분을 찾을 수 있습니다.'],
+        [`${topic}을/를 생활 속 사례와 연결하면 기억하기 쉽다.`,'O','생활 사례는 학습 내용을 더 오래 기억하게 도와줍니다.'],
+        [`${topic}을/를 공부할 때 용어의 의미를 확인하는 것이 좋다.`,'O','용어를 정확히 알면 문장을 더 잘 이해할 수 있습니다.'],
+        [`${topic}에 대해 한 사람의 의견만 들으면 언제나 충분하다.`,'X','중요한 주제는 여러 자료와 관점을 비교하는 것이 좋습니다.'],
+        [`${topic}은/는 원인과 결과를 구분해 생각하면 이해하기 쉽다.`,'O','원인과 결과를 나누면 구조적으로 이해할 수 있습니다.'],
+        [`${topic}에 대한 정보는 출처가 없어도 모두 신뢰할 수 있다.`,'X','출처 없는 정보는 확인이 필요합니다.'],
+        [`${topic}은/는 배운 내용을 직접 설명해 보면 이해도를 확인할 수 있다.`,'O','스스로 설명하면 모르는 부분이 드러납니다.'],
+        [`${topic} 문제는 쉬운 것부터 풀면 부담을 줄일 수 있다.`,'O','단계적으로 접근하면 학습 부담이 줄어듭니다.'],
+        [`${topic}은/는 처음부터 완벽히 이해해야만 배울 수 있다.`,'X','반복과 연습을 통해 점차 이해할 수 있습니다.']
+      ];
+      const exact=banks[key]||banks[topic]||generic;
+      const rows=[];
+      for(let i=0;i<n;i++){const r=exact[i%exact.length];rows.push({q:r[0],a:r[1],e:r[2]});}
+      return rows;
+    }
+    $('makeQuestions').onclick=()=>{const t=$('topic').value.trim()||'과학';const n=+$('count').value;const rows=sample(t,n);$('bulk').value='문제\t정답\t해설\n'+rows.map(x=>`${x.q}\t${x.a}\t${x.e}`).join('\n');beep();toast('OX 문제가 자동 생성되었습니다')}
+    $('loadQuestions').onclick=()=>{const qs=parseQuestions($('bulk').value);if(!qs.length)return toast('문제를 먼저 입력하세요');update({questions:qs,current:-1,started:false,revealed:false,answers:{},history:{}});toast(qs.length+'개 문제를 불러왔습니다')}
+    $('startGame').onclick=()=>{if(!game.questions?.length)return toast('문제를 먼저 불러오세요');update({current:0,started:true,revealed:false,answers:{}});beep('join')}
+    $('reveal').onclick=()=>{if(game.current<0)return;saveHistory(true)}
+    $('nextQ').onclick=()=>{if(game.current<0)return;if(!game.revealed) saveHistory(false); const next=game.current+1;if(next>=game.questions.length)return toast('마지막 문제입니다');update({current:next,revealed:false,answers:{}})}
+    $('resetGame').onclick=()=>{if(confirm('전체 초기화할까요?'))gameRef.set({questions:[],current:-1,started:false,revealed:false,answers:{},students:{},history:{}})}
+    $('joinBtn').onclick=()=>{const n=$('nickname').value.trim();if(!n)return toast('닉네임을 입력하세요');joined=true;meName=n;localStorage.setItem('ox_name',n);gameRef.child('students/'+uid).set({name:n,score:0,answered:0,joinedAt:Date.now()});$('joinBox').classList.add('hidden');beep('join');toast('참여했습니다')}
+    $('btnO').onclick=()=>answer('O');$('btnX').onclick=()=>answer('X');
+    function answer(v){if(!joined)return toast('먼저 참여하기를 누르세요');if(!game.started||game.current<0)return toast('아직 문제가 시작되지 않았습니다');if(game.revealed)return toast('정답 공개 후에는 선택할 수 없습니다');gameRef.child('answers/'+uid).set({name:meName,choice:v,at:Date.now()});beep();}
+    function saveHistory(reveal){const q=game.questions[game.current]; const ans=game.answers||{}; const total=Object.keys(ans).length; const correct=Object.values(ans).filter(a=>a.choice===q.a).length; const item={index:game.current+1,question:q.q,answer:q.a,explain:q.e,total,correct,rate:total?Math.round(correct/total*100):0,answers:ans,at:Date.now()}; const updates={revealed:reveal}; updates['history/q'+game.current]=item; Object.entries(ans).forEach(([id,a])=>{updates['students/'+id+'/score']=(game.students?.[id]?.score||0)+(a.choice===q.a?1:0);updates['students/'+id+'/answered']=(game.students?.[id]?.answered||0)+1}); update(updates); if(reveal) beep('correct')}
+    function render(){if(meName&&game.students?.[uid]){$('joinBox').classList.add('hidden');joined=true} const q=game.questions?.[game.current];$('qnum').textContent=q?`문제 ${game.current+1} / ${game.questions.length}`:'퀴즈 대기 중';$('question').textContent=q?q.q:'선생님이 문제를 시작하면 여기에 표시됩니다.';$('answer').textContent=(q&&game.revealed)?`정답: ${q.a}  ${q.e?'· '+q.e:''}`:'';$('status').textContent=game.revealed?'정답이 공개되었습니다.':(game.started?'O 또는 X를 선택하세요.':'아직 시작 전입니다.');const mine=game.answers?.[uid]?.choice;$('btnO').classList.toggle('selected',mine==='O');$('btnX').classList.toggle('selected',mine==='X'); if(q&&game.revealed&&mine===q.a){confetti();}
+      const ans=Object.values(game.answers||{});const o=ans.filter(a=>a.choice==='O').length,x=ans.filter(a=>a.choice==='X').length,totalS=Object.keys(game.students||{}).length, total=ans.length, correct=q?ans.filter(a=>a.choice===q.a).length:0, rate=total?Math.round(correct/total*100):0;$('totalStudents').textContent=totalS;$('oCount').textContent=o;$('xCount').textContent=x;$('rate').textContent=rate+'%';$('oBar').style.width=(total?o/total*100:0)+'%';$('xBar').style.width=(total?x/total*100:0)+'%';$('correctBar').style.width=rate+'%';
+      const rows=Object.values(game.students||{}).sort((a,b)=>(b.score||0)-(a.score||0)||(b.answered||0)-(a.answered||0));$('leaderBody').innerHTML=rows.length?rows.map((s,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(s.name||'익명')}</td><td>${s.score||0}</td><td>${s.answered||0}</td></tr>`).join(''):'<tr><td colspan="4">아직 참여자가 없습니다.</td></tr>';}
+    function escapeHtml(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+    $('downloadCsv').onclick=()=>{const hist=Object.values(game.history||{}).sort((a,b)=>a.index-b.index);if(!hist.length)return toast('저장된 결과가 없습니다');const lines=['문제번호,문제,정답,응답수,정답수,정답률'];hist.forEach(h=>lines.push([h.index,h.question,h.answer,h.total,h.correct,h.rate+'%'].map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')));const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ox-quiz-results.csv';a.click();URL.revokeObjectURL(a.href)}
+    function makeQR(){const url=location.origin+location.pathname; $('joinUrl').textContent=url; $('qr').innerHTML='<img alt="QR" width="150" height="150" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data='+encodeURIComponent(url)+'">'}
+    makeQR(); init();
+  </script>
+</body>
+</html>
